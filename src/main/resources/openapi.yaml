@@ -1,0 +1,352 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: "Food Manager API"
+  description: Manages food operations
+
+servers:
+  - url: http://localhost:8080/api
+
+paths:
+  /foods/{id}:
+    parameters:
+      - name: id
+        description: The unique identifier of food
+        in: path
+        required: true
+        schema:
+          $ref: "#/components/schemas/FoodId"
+    get:
+      operationId: getFoodById
+      summary: Reads food for a given id
+      responses:
+        200:
+          description: The food corresponding to the provided `foodId`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Food"
+        404:
+          description: No food found for the provided `foodId`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      operationId: updateFood
+      summary: Modifies food
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Food"
+      responses:
+        200:
+          description: The food corresponding to the provided `foodId`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodId"
+        404:
+          description: No food found for the provided `foodId`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      operationId: deleteFood
+      summary: Soft delete a food
+      responses:
+        200:
+          description: The food corresponding to the provided `foodId`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodId"
+        404:
+          description: No food found for the provided `foodId`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /foods:
+    post:
+      operationId: createFood
+      summary: Creates food
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Food"
+      responses:
+        200:
+          description: The food corresponding to the provided `foodId`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodId"
+        404:
+          description: No food found for the provided `foodId`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /foodtypes:
+    get:
+      operationId: getFoodTypes
+      summary: Get all foodTypes
+      responses:
+        200:
+          description: The list of foodTypes available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FoodTypes"
+        404:
+          description: No foodTypes found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /containers:
+    get:
+      operationId: getContainers
+      summary: Get all containers
+      responses:
+        200:
+          description: The list of containers available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Containers"
+        404:
+          description: No foodTypes found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /statuses:
+    get:
+      operationId: getStatuses
+      summary: Get all status
+      responses:
+        200:
+          description: The list of status available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StatusList"
+        404:
+          description: No foodTypes found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /customers:
+    get:
+      operationId: getCustomers
+      summary: Get all customers
+      responses:
+        200:
+          description: The list of customers available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customers"
+        404:
+          description: No foodTypes found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+  /uoms:
+    get:
+      operationId: getUoms
+      summary: Get all uoms
+      responses:
+        200:
+          description: The list of uoms available
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Uoms"
+        404:
+          description: No foodTypes found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        500:
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  schemas:
+    FoodId:
+      description: The unique identifier of a food
+      type: string
+    Food:
+      type: object
+      required:
+        - id
+        - name
+        - foodTypeId
+        - capacity
+        - containerTypeId
+        - statusId
+        - createdBy
+        - createdTimestamp
+      properties:
+        id:
+          $ref: "#/components/schemas/FoodId"
+        requiresCooler:
+          type: boolean
+        name:
+          type: string
+        foodTypeId:
+          $ref: "#/components/schemas/FoodType"
+        capacity:
+          $ref: "#/components/schemas/Uom"
+        containerTypeId:
+          $ref: "#/components/schemas/Container"
+        statusId:
+          $ref: "#/components/schemas/Status"
+        createdBy:
+          $ref: "#/components/schemas/Customer"
+        createdTimestamp:
+          type: string
+          format: date-time
+        lastUpdatedBy:
+          $ref: "#/components/schemas/Customer"
+        lastUpdatedTimestamp:
+          type: string
+          format: date-time
+    FoodType:
+      type: object
+      properties:
+        typeId:
+          type: string
+        description:
+          type: string
+    FoodTypes:
+      type: object
+      items:
+        $ref: "#/components/schemas/FoodType"
+    Container:
+      type: object
+      properties:
+        containerTypeId:
+          type: string
+        description:
+          type: string
+    Containers:
+      type: object
+      items:
+        $ref: "#/components/schemas/Container"
+    Status:
+      type: object
+      properties:
+        statusId:
+          type: string
+        description:
+          type: string
+    StatusList:
+      items:
+        $ref: "#/components/schemas/Status"
+    Customer:
+      type: object
+      properties:
+        userName:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        lastName:
+          type: string
+    Customers:
+      items:
+        $ref: "#/components/schemas/Customer"
+    Uom:
+      type: object
+      properties:
+        uomId:
+          type: string
+        uomType:
+          type: string
+        value:
+          type: string
+        description:
+          type: string
+    Uoms:
+      items:
+        $ref: "#/components/schemas/Uom"
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          description: A human readable error message
+          type: string
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: X-Api-Key
+security:
+  - ApiKey: [ ]
