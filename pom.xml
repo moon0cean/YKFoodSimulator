@@ -8,6 +8,14 @@
     <artifactId>foodSimulator</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <distributionManagement>
+        <repository>
+            <id>foodSimulator</id>
+            <name>Food Simulator</name>
+            <url>https://github.com/moon0cean/foodSimulator</url>
+        </repository>
+    </distributionManagement>
+
     <!-- Inherit defaults from Spring Boot -->
     <parent>
         <groupId>org.springframework.boot</groupId>
