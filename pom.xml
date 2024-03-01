@@ -8,6 +8,8 @@
     <artifactId>foodSimulator</artifactId>
     <version>1.0.4</version>
 
+    <packaging>jar</packaging>
+
     <distributionManagement>
         <repository>
             <id>github</id>
