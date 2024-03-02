@@ -7,12 +7,15 @@ import com.vincle.foodManager.model.Food;
 import com.vincle.foodManager.model.FoodType;
 import com.vincle.foodManager.model.Status;
 import com.vincle.foodManager.model.Uom;
+import okhttp3.Response;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -79,96 +82,69 @@ public class FoodScheduler {
                 switch (status.getStatusId()) {
                     case "CREATED":
                         food.setCreatedBy(customerList.get(randomCustomerIdx));
-                        api.createFoodAsync(food, new ApiCallback<>() {
-                            @Override
-                            public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                                logger.error("Thread[{}] failed creation request[{}] ", threadName, i);
-                            }
-
-                            @Override
-                            public void onSuccess(String foodId, int statusCode, Map<String, List<String>> responseHeaders) {
-                                createdFoodIds.add(foodId);
-                                logger.info("Thread[{}] success creation request[{}] with foodId {}", threadName, i, foodId);
-                            }
-
-                            @Override
-                            public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
-                                // FIXME: why is this invoked?
-//                                logger.error("Thread[{}] uploadProgress unsupported [{}]: ", threadId, i);
-                            }
-
-                            @Override
-                            public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
-                                // FIXME: why is this invoked?
-//                                logger.error("Thread[{}] downloadProgress unsupported [{}]: ", threadId, i);
-                            }
-                        });
+                        Response createdResponse = api.createFoodCall(food, getApiCallback()).execute();
+                        handleAPICallResponse(createdResponse, status.getStatusId(), i);
                         break;
                     case "UPDATED":
                         food.setLastUpdatedBy(customerList.get(randomCustomerIdx));
                         int randomFoodIdx = ThreadLocalRandom.current().nextInt(createdFoodIds.size()) % createdFoodIds.size();
-                        api.updateFoodAsync(createdFoodIds.get(randomFoodIdx), food, new ApiCallback<>() {
-                            @Override
-                            public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                                logger.error("Thread[{}] failed update request[{}] ", threadName, i);
-                            }
-
-                            @Override
-                            public void onSuccess(String foodId, int statusCode, Map<String, List<String>> responseHeaders) {
-                                logger.info("Thread[{}] success update request[{}] with foodId {}", threadName, i, foodId);
-                            }
-
-                            @Override
-                            public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
-                                // FIXME: why is this invoked?
-//                                logger.error("Thread[{}] uploadProgress unsupported [{}]: ", threadId, i);
-                            }
-
-                            @Override
-                            public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
-                                // FIXME: why is this invoked?
-//                                logger.error("Thread[{}] downloadProgress unsupported [{}]: ", threadId, i);
-                            }
-                        });
+                        Response updatedResponse = api.updateFoodCall(createdFoodIds.get(randomFoodIdx), food, getApiCallback()).execute();
+                        handleAPICallResponse(updatedResponse, status.getStatusId(), i);
                         break;
                     case "DELETED":
                         food.setLastUpdatedBy(customerList.get(randomCustomerIdx));
                         randomFoodIdx = ThreadLocalRandom.current().nextInt(createdFoodIds.size()) % createdFoodIds.size();
-                        api.deleteFoodAsync(createdFoodIds.get(randomFoodIdx), new ApiCallback<>() {
-                            @Override
-                            public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
-                                logger.error("Thread[{}] failed delete request[{}] ", threadName, i);
-                            }
-
-                            @Override
-                            public void onSuccess(String foodId, int statusCode, Map<String, List<String>> responseHeaders) {
-                                // FIXME: fix concurrency issue
-                                createdFoodIds.remove(randomFoodIdx);
-                                logger.info("Thread[{}] success delete request[{}] with foodId {}", threadName, i, foodId);
-                            }
-
-                            @Override
-                            public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
-                                // FIXME: why is this invoked?
-//                                logger.error("Thread[{}] uploadProgress unsupported [{}]: ", threadId, i);
-                            }
-
-                            @Override
-                            public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
-//                                logger.error("Thread[{}] downloadProgress unsupported [{}]: ", threadId, i);
-                            }
-                        });
+                        Response deletedResponse = api.deleteFoodCall(createdFoodIds.get(randomFoodIdx), getApiCallback()).execute();
+                        handleAPICallResponse(deletedResponse, status.getStatusId(), i);
                         break;
                     default:
                         logger.error("Unsupported status: " + status.getStatusId());
                         break;
 
                 }
-            } catch (ApiException e) {
+            } catch (ApiException | IOException e) {
                 logger.error(e.getMessage());
             }
         }
         logger.info("Thread[{}] finished batch of requests at {}", threadName, dateFormat.format(new Date()));
+    }
+
+    @NotNull
+    private static ApiCallback<String> getApiCallback() {
+        return new ApiCallback<>() {
+            @Override
+            public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+            }
+
+            @Override
+            public void onSuccess(String foodId, int statusCode, Map<String, List<String>> responseHeaders) {
+            }
+
+            @Override
+            public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+            }
+
+            @Override
+            public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+            }
+        };
+    }
+
+    private void handleAPICallResponse(Response response, String statusId, int requestNumber) throws IOException {
+        String threadName = Thread.currentThread().getName();
+        if (response.isSuccessful()) {
+            String foodId = response.body().string();
+            synchronized (createdFoodIds) {
+                if (statusId.equals("CREATED")) {
+                    createdFoodIds.add(foodId);
+                } else if (statusId.equals("DELETED")) {
+                    createdFoodIds.remove(foodId);
+                }
+            }
+            logger.info("Thread[{}] success " + statusId + " request[{}] with foodId {}", threadName, requestNumber, foodId);
+        } else {
+            logger.info("Thread[{}] failure " + statusId + " request[{}] with foodId {}", threadName, requestNumber);
+        }
     }
 
 }
