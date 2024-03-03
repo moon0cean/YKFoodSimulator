@@ -26,8 +26,7 @@ The system has been implemented using the following stack of technologies:
 ## Installation
 
 * Build project
-  - `mvn clean install`
-  - `mvn spring-boot:run` 
+  - `mvn clean install`  
   - `docker build --tag=food-simulator:latest .` (required if used in docker-compose)
 
 ## Food Simulator
