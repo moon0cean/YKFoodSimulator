@@ -1,4 +1,4 @@
-package com.vincle.foodManager;
+package org.yk.foodManager;
 
 import lombok.Getter;
 import lombok.Setter;

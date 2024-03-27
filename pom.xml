@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.vincle</groupId>
+    <groupId>org.yk</groupId>
     <artifactId>foodSimulator</artifactId>
     <version>1.0.4</version>
 
@@ -106,11 +106,11 @@
     </dependencies>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <start-class>com.vincle.foodManager.FoodManagerSimulator</start-class>
+        <start-class>org.yk.foodManager.FoodManagerSimulator</start-class>
     </properties>
 
     <build>
@@ -140,8 +140,8 @@
                             <inputSpec>
                                 ${project.basedir}/src/main/resources/openapi.yaml
                             </inputSpec>
-                            <apiPackage>com.vincle.foodManager.api</apiPackage>
-                            <modelPackage>com.vincle.foodManager.model</modelPackage>
+                            <apiPackage>org.yk.foodManager.api</apiPackage>
+                            <modelPackage>org.yk.foodManager.model</modelPackage>
 
                             <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
                             <generateApis>true</generateApis>

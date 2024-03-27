@@ -1,11 +1,11 @@
-package com.vincle.foodManager;
+package org.yk.foodManager;
 
-import com.vincle.foodManager.api.DefaultApi;
-import com.vincle.foodManager.model.Container;
-import com.vincle.foodManager.model.Customer;
-import com.vincle.foodManager.model.FoodType;
-import com.vincle.foodManager.model.Status;
-import com.vincle.foodManager.model.Uom;
+import org.yk.foodManager.api.DefaultApi;
+import org.yk.foodManager.model.Container;
+import org.yk.foodManager.model.Customer;
+import org.yk.foodManager.model.FoodType;
+import org.yk.foodManager.model.Status;
+import org.yk.foodManager.model.Uom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

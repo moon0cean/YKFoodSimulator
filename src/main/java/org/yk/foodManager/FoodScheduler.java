@@ -1,12 +1,12 @@
-package com.vincle.foodManager;
+package org.yk.foodManager;
 
-import com.vincle.foodManager.api.DefaultApi;
-import com.vincle.foodManager.model.Container;
-import com.vincle.foodManager.model.Customer;
-import com.vincle.foodManager.model.Food;
-import com.vincle.foodManager.model.FoodType;
-import com.vincle.foodManager.model.Status;
-import com.vincle.foodManager.model.Uom;
+import org.yk.foodManager.api.DefaultApi;
+import org.yk.foodManager.model.Container;
+import org.yk.foodManager.model.Customer;
+import org.yk.foodManager.model.Food;
+import org.yk.foodManager.model.FoodType;
+import org.yk.foodManager.model.Status;
+import org.yk.foodManager.model.Uom;
 import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
